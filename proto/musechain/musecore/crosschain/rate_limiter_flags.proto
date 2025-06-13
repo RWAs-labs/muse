@@ -1,0 +1,42 @@
+syntax = "proto3";
+package musechain.musecore.crosschain;
+
+import "gogoproto/gogo.proto";
+import "musechain/musecore/pkg/coin/coin.proto";
+
+option go_package = "github.com/RWAs-labs/muse/x/crosschain/types";
+
+message RateLimiterFlags {
+  bool enabled = 1;
+
+  // window in blocks
+  int64 window = 2;
+
+  // rate in amuse per block
+  string rate = 3 [
+    (gogoproto.customtype) = "cosmossdk.io/math.Uint",
+    (gogoproto.nullable) = false
+  ];
+
+  // conversion in amuse per token
+  repeated Conversion conversions = 4 [ (gogoproto.nullable) = false ];
+}
+
+message Conversion {
+  string mrc20 = 1;
+  string rate = 2 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}
+
+message AssetRate {
+  int64 chainId = 1;
+  string asset = 2;
+  uint32 decimals = 3;
+  pkg.coin.CoinType coin_type = 4;
+  string rate = 5 [
+    (gogoproto.customtype) = "cosmossdk.io/math.LegacyDec",
+    (gogoproto.nullable) = false
+  ];
+}

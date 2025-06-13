@@ -1,0 +1,11 @@
+syntax = "proto3";
+package musechain.musecore.observer;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/RWAs-labs/muse/x/observer/types";
+
+message TssFundMigratorInfo {
+  int64 chain_id = 1;
+  string migration_cctx_index = 2;
+}

@@ -1,0 +1,2 @@
+musecored tx crosschain gas-price-voter 1337 10000000000 100 100 --from=muse --keyring-backend=test --yes --chain-id=localnet_101-1 --broadcast-mode=block --gas=auto --gas-adjustment=2 --gas-prices=0.1amuse --log_format=json
+#musecored tx crosschain nonce-voter Goerli 1  --from=muse --keyring-backend=test --yes --chain-id=localnet_101-1 --broadcast-mode=block --gas=auto --gas-adjustment=2 --gas-prices=0.1amuse --broadcast-mode=block

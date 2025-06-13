@@ -1,0 +1,124 @@
+# This docker-compose updates the services to use a persistent data directory
+# clear these volumes with this command: docker volume rm $(docker volume ls -q | grep -- '-persist$')
+
+services:
+  musecore0:
+    volumes:
+      - musecore0-musecored-persist:/root/.musecored
+
+  musecore1:
+    volumes:
+      - musecore1-musecored-persist:/root/.musecored
+
+  musecore2:
+    volumes:
+      - musecore2-musecored-persist:/root/.musecored
+
+  musecore3:
+    volumes:
+      - musecore3-musecored-persist:/root/.musecored
+
+  museclient0:
+    volumes:
+      - museclient0-musecored-persist:/root/.musecored
+      - museclient0-tss-persist:/root/.tss
+      - museclient0-museclient-persist:/root/.museclient
+
+  museclient1:
+    volumes:
+      - museclient1-musecored-persist:/root/.musecored
+      - museclient1-tss-persist:/root/.tss
+      - museclient1-museclient-persist:/root/.museclient
+
+  museclient2:
+    volumes:
+      - museclient2-musecored-persist:/root/.musecored
+      - museclient2-tss-persist:/root/.tss
+      - museclient2-museclient-persist:/root/.museclient
+
+  museclient3:
+    volumes:
+      - museclient3-musecored-persist:/root/.musecored
+      - museclient3-tss-persist:/root/.tss
+      - museclient3-museclient-persist:/root/.museclient
+
+  eth:
+    volumes:
+      - eth-data-persist:/root/data
+
+  bitcoin:
+    volumes:
+      - btc-data-persist:/root/.bitcoin
+
+  solana:
+    volumes:
+      - solana-ledger-persist:/data/test-ledger
+    profiles:
+      - solana
+      - all
+
+  orchestrator:
+    volumes:
+      - orchestrator-state-persist:/root/state
+
+volumes:
+  musecore0-musecored-persist:
+    labels:
+      - "localnet=true"
+  musecore1-musecored-persist:
+    labels:
+      - "localnet=true"
+  musecore2-musecored-persist:
+    labels:
+      - "localnet=true"
+  musecore3-musecored-persist:
+    labels:
+      - "localnet=true"
+  museclient0-musecored-persist:
+    labels:
+      - "localnet=true"
+  museclient0-tss-persist:
+    labels:
+      - "localnet=true"
+  museclient0-museclient-persist:
+    labels:
+      - "localnet=true"
+  museclient1-musecored-persist:
+    labels:
+      - "localnet=true"
+  museclient1-tss-persist:
+    labels:
+      - "localnet=true"
+  museclient1-museclient-persist:
+    labels:
+      - "localnet=true"
+  museclient2-musecored-persist:
+    labels:
+      - "localnet=true"
+  museclient2-tss-persist:
+    labels:
+      - "localnet=true"
+  museclient2-museclient-persist:
+    labels:
+      - "localnet=true"
+  museclient3-musecored-persist:
+    labels:
+      - "localnet=true"
+  museclient3-tss-persist:
+    labels:
+      - "localnet=true"
+  museclient3-museclient-persist:
+    labels:
+      - "localnet=true"
+  eth-data-persist:
+    labels:
+      - "localnet=true"
+  btc-data-persist:
+    labels:
+      - "localnet=true"
+  orchestrator-state-persist:
+    labels:
+      - "localnet=true"
+  solana-ledger-persist:
+    labels:
+      - "localnet=true"

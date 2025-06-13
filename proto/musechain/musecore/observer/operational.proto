@@ -1,0 +1,24 @@
+syntax = "proto3";
+package musechain.musecore.observer;
+
+import "gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
+
+option go_package = "github.com/RWAs-labs/muse/x/observer/types";
+
+// Flags for the top-level operation of museclient.
+message OperationalFlags {
+  // Height for a coordinated museclient restart.
+  // Will be ignored if missed.
+  int64 restart_height = 1;
+
+  // Offset from the musecore block time to initiate signing.
+  // Should be calculated and set based on max(museclient_core_block_latency).
+  google.protobuf.Duration signer_block_time_offset = 2
+      [ (gogoproto.stdduration) = true ];
+
+  // Minimum version of museclient that is allowed to run. This must be either
+  // a valid semver string (v23.0.1) or empty. If empty, all versions are
+  // allowed.
+  string minimum_version = 3;
+}

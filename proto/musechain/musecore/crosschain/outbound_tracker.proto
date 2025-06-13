@@ -1,0 +1,19 @@
+syntax = "proto3";
+package musechain.musecore.crosschain;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/RWAs-labs/muse/x/crosschain/types";
+
+message TxHash {
+  string tx_hash = 1;
+  string tx_signer = 2;
+
+  bool proven = 3 [ deprecated = true ];
+}
+message OutboundTracker {
+  string index = 1; // format: "chain-nonce"
+  int64 chain_id = 2;
+  uint64 nonce = 3;
+  repeated TxHash hash_list = 4;
+}

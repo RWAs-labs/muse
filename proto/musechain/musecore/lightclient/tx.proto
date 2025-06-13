@@ -1,0 +1,32 @@
+syntax = "proto3";
+package musechain.musecore.lightclient;
+
+import "gogoproto/gogo.proto";
+import "musechain/musecore/lightclient/block_header_verification.proto";
+import "cosmos/msg/v1/msg.proto";
+
+option go_package = "github.com/RWAs-labs/muse/x/lightclient/types";
+
+// Msg defines the Msg service.
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+  rpc EnableHeaderVerification(MsgEnableHeaderVerification)
+      returns (MsgEnableHeaderVerificationResponse);
+  rpc DisableHeaderVerification(MsgDisableHeaderVerification)
+      returns (MsgDisableHeaderVerificationResponse);
+}
+
+message MsgEnableHeaderVerification {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  repeated int64 chain_id_list = 2;
+}
+
+message MsgEnableHeaderVerificationResponse {}
+
+message MsgDisableHeaderVerification {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  repeated int64 chain_id_list = 2;
+}
+message MsgDisableHeaderVerificationResponse {}

@@ -1,0 +1,21 @@
+syntax = "proto3";
+package musechain.musecore.authority;
+
+import "gogoproto/gogo.proto";
+import "musechain/musecore/authority/policies.proto";
+
+option go_package = "github.com/RWAs-labs/muse/x/authority/types";
+
+// Authorization defines the authorization required to access use a message
+// which needs special permissions
+message Authorization {
+  // The URL of the message that needs to be authorized
+  string msg_url = 1;
+  // The policy that is authorized to access the message
+  PolicyType authorized_policy = 2;
+}
+
+// AuthorizationList holds the list of authorizations on musechain
+message AuthorizationList {
+  repeated Authorization authorizations = 1 [ (gogoproto.nullable) = false ];
+}

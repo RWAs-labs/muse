@@ -1,0 +1,12 @@
+syntax = "proto3";
+package musechain.musecore.fungible;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/RWAs-labs/muse/x/fungible/types";
+
+message SystemContract {
+  string system_contract = 1;
+  string connector_mevm = 2;
+  string gateway = 3;
+}

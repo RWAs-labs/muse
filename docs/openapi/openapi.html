@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.18.2/swagger-ui.min.css"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.18.2/favicon-16x16.png"
+    />
+  </head>
+  <body>
+    <div id="swagger-ui"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5.18.2/swagger-ui-bundle.min.js"></script>
+    <script>
+      window.onload = function() {
+          window.ui = SwaggerUIBundle({
+              url: "./openapi.swagger.yaml",
+              dom_id: "#swagger-ui",
+              deepLinking: true,
+              layout: "BaseLayout",
+              showExtensions: true,
+              showCommonExtensions: true,
+              defaultModelExpandDepth: 5
+          });
+      }
+    </script>
+  </body>
+</html>

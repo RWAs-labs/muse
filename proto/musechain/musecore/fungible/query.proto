@@ -1,0 +1,125 @@
+syntax = "proto3";
+package musechain.musecore.fungible;
+
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "musechain/musecore/fungible/foreign_coins.proto";
+import "musechain/musecore/fungible/system_contract.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/msg/v1/msg.proto";
+
+option go_package = "github.com/RWAs-labs/muse/x/fungible/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  option (cosmos.msg.v1.service) = true;
+  // Queries a ForeignCoins by index.
+  rpc ForeignCoins(QueryGetForeignCoinsRequest)
+      returns (QueryGetForeignCoinsResponse) {
+    option (google.api.http).get = "/muse-chain/fungible/foreign_coins/{index}";
+  }
+
+  // Queries a list of ForeignCoins items.
+  rpc ForeignCoinsAll(QueryAllForeignCoinsRequest)
+      returns (QueryAllForeignCoinsResponse) {
+    option (google.api.http).get = "/muse-chain/fungible/foreign_coins";
+  }
+
+  // Queries a ForeignCoins by chain_id and asset.
+  rpc ForeignCoinsFromAsset(QueryGetForeignCoinsFromAssetRequest)
+      returns (QueryGetForeignCoinsFromAssetResponse) {
+    option (google.api.http).get =
+        "/muse-chain/fungible/foreign_coins/{chain_id}/{asset}";
+  }
+
+  // Queries SystemContract
+  rpc SystemContract(QueryGetSystemContractRequest)
+      returns (QueryGetSystemContractResponse) {
+    option (google.api.http).get = "/muse-chain/fungible/system_contract";
+  }
+
+  // Queries the address of a gas stability pool on a given chain.
+  rpc GasStabilityPoolAddress(QueryGetGasStabilityPoolAddress)
+      returns (QueryGetGasStabilityPoolAddressResponse) {
+    option (google.api.http).get =
+        "/muse-chain/fungible/gas_stability_pool_address";
+  }
+
+  // Queries the balance of a gas stability pool on a given chain.
+  rpc GasStabilityPoolBalance(QueryGetGasStabilityPoolBalance)
+      returns (QueryGetGasStabilityPoolBalanceResponse) {
+    option (google.api.http).get =
+        "/muse-chain/fungible/gas_stability_pool_balance/{chain_id}";
+  }
+
+  // Queries all gas stability pool balances.
+  rpc GasStabilityPoolBalanceAll(QueryAllGasStabilityPoolBalance)
+      returns (QueryAllGasStabilityPoolBalanceResponse) {
+    option (google.api.http).get =
+        "/muse-chain/musecore/fungible/gas_stability_pool_balance";
+  }
+
+  // Code hash query the code hash of a contract.
+  rpc CodeHash(QueryCodeHashRequest) returns (QueryCodeHashResponse) {
+    option (google.api.http).get = "/muse-chain/fungible/code_hash/{address}";
+  }
+}
+
+message QueryGetForeignCoinsRequest { string index = 1; }
+
+message QueryGetForeignCoinsResponse {
+  ForeignCoins foreignCoins = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryAllForeignCoinsRequest {
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+message QueryAllForeignCoinsResponse {
+  repeated ForeignCoins foreignCoins = 1 [ (gogoproto.nullable) = false ];
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryGetForeignCoinsFromAssetRequest defines the request type for the
+// ForeignCoinsFromAsset RPC method.
+message QueryGetForeignCoinsFromAssetRequest {
+  int64 chain_id = 1;
+  string asset = 2;
+}
+
+// QueryGetForeignCoinsFromAssetResponse defines the response type for the
+// ForeignCoinsFromAsset RPC method.
+message QueryGetForeignCoinsFromAssetResponse {
+  ForeignCoins foreignCoins = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryGetSystemContractRequest {}
+
+message QueryGetSystemContractResponse {
+  SystemContract SystemContract = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryGetGasStabilityPoolAddress {}
+
+message QueryGetGasStabilityPoolAddressResponse {
+  string cosmos_address = 1;
+  string evm_address = 2;
+}
+
+message QueryGetGasStabilityPoolBalance { int64 chain_id = 1; }
+
+message QueryGetGasStabilityPoolBalanceResponse { string balance = 2; }
+
+message QueryAllGasStabilityPoolBalance {}
+
+message QueryAllGasStabilityPoolBalanceResponse {
+  message Balance {
+    int64 chain_id = 1;
+    string balance = 2;
+  }
+  repeated Balance balances = 1 [ (gogoproto.nullable) = false ];
+}
+
+message QueryCodeHashRequest { string address = 1; }
+
+message QueryCodeHashResponse { string code_hash = 1; }

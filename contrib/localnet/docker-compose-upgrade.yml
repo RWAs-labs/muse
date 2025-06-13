@@ -1,0 +1,26 @@
+# This docker-compose updates the services to use the old version of the musenode image
+
+services:
+  musecore0:
+    image: musenode:old
+
+  musecore1:
+    image: musenode:old
+
+  musecore2:
+    image: musenode:old
+
+  musecore3:
+    image: musenode:old
+
+  museclient0:
+    image: musenode:old
+
+  museclient1:
+    image: musenode:old
+
+  museclient2:
+    image: musenode:old
+
+  museclient3:  
+    image: musenode:old

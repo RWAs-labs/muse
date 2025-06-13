@@ -1,0 +1,9 @@
+syntax = "proto3";
+package musechain.musecore.ibccrosschain;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/RWAs-labs/muse/x/ibccrosschain/types";
+
+// Msg defines the Msg service.
+service Msg {}

@@ -1,0 +1,8 @@
+{
+ "title": "v100.0.0",
+ "authors": "MuseChain Core Contributor Team",
+ "summary": "This is the v100.0.0 upgrade for the Athens testnet",
+ "details": "See Release Notes https://github.com/RWAs-labs/muse/releases/tag/v100.0.0",
+ "proposal_forum_url": "https://discord.gg/musechain",
+ "vote_option_context": "Voting yes on this proposal indicates you want to upgrade the MuseChain node software to v1v1001.0.0 and the specified height"
+}

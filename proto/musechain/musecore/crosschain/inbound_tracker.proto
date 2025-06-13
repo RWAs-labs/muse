@@ -1,0 +1,12 @@
+syntax = "proto3";
+package musechain.musecore.crosschain;
+
+import "musechain/musecore/pkg/coin/coin.proto";
+
+option go_package = "github.com/RWAs-labs/muse/x/crosschain/types";
+
+message InboundTracker {
+  int64 chain_id = 1;
+  string tx_hash = 2;
+  pkg.coin.CoinType coin_type = 3;
+}

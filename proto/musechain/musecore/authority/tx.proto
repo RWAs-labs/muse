@@ -1,0 +1,81 @@
+syntax = "proto3";
+package musechain.musecore.authority;
+
+import "musechain/musecore/authority/policies.proto";
+import "musechain/musecore/authority/chain_info.proto";
+import "musechain/musecore/authority/authorization.proto";
+import "musechain/musecore/pkg/chains/chains.proto";
+import "gogoproto/gogo.proto";
+import "cosmos/msg/v1/msg.proto";
+
+option go_package = "github.com/RWAs-labs/muse/x/authority/types";
+
+// Msg defines the Msg service.
+service Msg {
+  option (cosmos.msg.v1.service) = true;
+  rpc UpdatePolicies(MsgUpdatePolicies) returns (MsgUpdatePoliciesResponse);
+  rpc UpdateChainInfo(MsgUpdateChainInfo) returns (MsgUpdateChainInfoResponse);
+  rpc RemoveChainInfo(MsgRemoveChainInfo) returns (MsgRemoveChainInfoResponse);
+  rpc AddAuthorization(MsgAddAuthorization)
+      returns (MsgAddAuthorizationResponse);
+  rpc RemoveAuthorization(MsgRemoveAuthorization)
+      returns (MsgRemoveAuthorizationResponse);
+}
+
+// MsgAddAuthorization defines the MsgAddAuthorization service.
+// Adds an authorization to the chain. If the authorization already exists, it
+// will be updated.
+message MsgAddAuthorization {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string msg_url = 2;
+  PolicyType authorized_policy = 3;
+}
+
+// MsgAddAuthorizationResponse defines the MsgAddAuthorizationResponse service.
+message MsgAddAuthorizationResponse {}
+
+// MsgRemoveAuthorization defines the MsgRemoveAuthorization service.
+// Removes an authorization from the chain.
+message MsgRemoveAuthorization {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  string msg_url = 2;
+}
+
+// MsgRemoveAuthorizationResponse defines the MsgRemoveAuthorizationResponse
+// service.
+message MsgRemoveAuthorizationResponse {}
+
+// MsgUpdatePolicies defines the MsgUpdatePolicies service.
+message MsgUpdatePolicies {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  Policies policies = 2 [ (gogoproto.nullable) = false ];
+}
+
+// MsgUpdatePoliciesResponse defines the MsgUpdatePoliciesResponse service.
+message MsgUpdatePoliciesResponse {}
+
+// MsgUpdateChainInfo defines the MsgUpdateChainInfo service.
+message MsgUpdateChainInfo {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  pkg.chains.Chain chain = 3 [ (gogoproto.nullable) = false ];
+
+  // Do not edit
+  reserved 2;
+}
+
+// MsgUpdateChainInfoResponse defines the MsgUpdateChainInfoResponse service.
+message MsgUpdateChainInfoResponse {}
+
+// MsgRemoveChainInfo defines the MsgRemoveChainInfo service.
+message MsgRemoveChainInfo {
+  option (cosmos.msg.v1.signer) = "creator";
+  string creator = 1;
+  int64 chain_id = 2;
+}
+
+// MsgRemoveChainInfoResponse defines the MsgRemoveChainInfoResponse service.
+message MsgRemoveChainInfoResponse {}

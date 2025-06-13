@@ -1,0 +1,7 @@
+syntax = "proto3";
+package musechain.musecore.ibccrosschain;
+
+option go_package = "github.com/RWAs-labs/muse/x/ibccrosschain/types";
+
+// Query defines the gRPC querier service.
+service Query {}

@@ -1,0 +1,9 @@
+syntax = "proto3";
+package musechain.musecore.crosschain;
+
+option go_package = "github.com/RWAs-labs/muse/x/crosschain/types";
+
+message InboundHashToCctx {
+  string inbound_hash = 1;
+  repeated string cctx_index = 2;
+}

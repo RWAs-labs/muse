@@ -1,0 +1,40 @@
+syntax = "proto3";
+package musechain.musecore.observer;
+
+import "gogoproto/gogo.proto";
+import "musechain/musecore/observer/ballot.proto";
+import "musechain/musecore/observer/blame.proto";
+import "musechain/musecore/observer/chain_nonces.proto";
+import "musechain/musecore/observer/crosschain_flags.proto";
+import "musechain/musecore/observer/keygen.proto";
+import "musechain/musecore/observer/node_account.proto";
+import "musechain/musecore/observer/nonce_to_cctx.proto";
+import "musechain/musecore/observer/observer.proto";
+import "musechain/musecore/observer/params.proto";
+import "musechain/musecore/observer/pending_nonces.proto";
+import "musechain/musecore/observer/tss.proto";
+import "musechain/musecore/observer/tss_funds_migrator.proto";
+import "musechain/musecore/observer/operational.proto";
+
+option go_package = "github.com/RWAs-labs/muse/x/observer/types";
+
+message GenesisState {
+  repeated Ballot ballots = 1;
+  ObserverSet observers = 2 [ (gogoproto.nullable) = false ];
+  repeated NodeAccount nodeAccountList = 3;
+  CrosschainFlags crosschain_flags = 4;
+  // Deprecated(v17) removed
+  Params params = 5;
+  Keygen keygen = 6;
+  LastObserverCount last_observer_count = 7;
+  ChainParamsList chain_params_list = 8 [ (gogoproto.nullable) = false ];
+  TSS tss = 9;
+  repeated TSS tss_history = 10 [ (gogoproto.nullable) = false ];
+  repeated TssFundMigratorInfo tss_fund_migrators = 11
+      [ (gogoproto.nullable) = false ];
+  repeated Blame blame_list = 12 [ (gogoproto.nullable) = false ];
+  repeated PendingNonces pending_nonces = 13 [ (gogoproto.nullable) = false ];
+  repeated ChainNonces chain_nonces = 14 [ (gogoproto.nullable) = false ];
+  repeated NonceToCctx nonce_to_cctx = 15 [ (gogoproto.nullable) = false ];
+  OperationalFlags operational_flags = 16 [ (gogoproto.nullable) = false ];
+}

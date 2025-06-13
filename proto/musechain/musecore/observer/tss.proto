@@ -1,0 +1,14 @@
+syntax = "proto3";
+package musechain.musecore.observer;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/RWAs-labs/muse/x/observer/types";
+
+message TSS {
+  string tss_pubkey = 3;
+  repeated string tss_participant_list = 4;
+  repeated string operator_address_list = 5;
+  int64 finalizedMuseHeight = 6;
+  int64 keyGenMuseHeight = 7;
+}

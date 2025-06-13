@@ -1,0 +1,76 @@
+syntax = "proto3";
+package musechain.musecore.authority;
+
+import "musechain/musecore/authority/policies.proto";
+import "musechain/musecore/authority/chain_info.proto";
+import "musechain/musecore/authority/authorization.proto";
+import "cosmos/base/query/v1beta1/pagination.proto";
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "cosmos/msg/v1/msg.proto";
+
+option go_package = "github.com/RWAs-labs/muse/x/authority/types";
+
+// Query defines the gRPC querier service.
+service Query {
+  option (cosmos.msg.v1.service) = true;
+  // Queries Policies
+  rpc Policies(QueryGetPoliciesRequest) returns (QueryGetPoliciesResponse) {
+    option (google.api.http).get = "/muse-chain/authority/policies";
+  }
+
+  // Queries ChainInfo
+  rpc ChainInfo(QueryGetChainInfoRequest) returns (QueryGetChainInfoResponse) {
+    option (google.api.http).get = "/muse-chain/authority/chainInfo";
+  }
+
+  rpc AuthorizationList(QueryAuthorizationListRequest)
+      returns (QueryAuthorizationListResponse) {
+    option (google.api.http).get = "/muse-chain/authority/authorizations";
+  }
+
+  rpc Authorization(QueryAuthorizationRequest)
+      returns (QueryAuthorizationResponse) {
+    option (google.api.http).get =
+        "/muse-chain/authority/authorization/{msg_url}";
+  }
+}
+
+// QueryAuthorizationListRequest is the request type for the
+// Query/AuthorizationList RPC method.
+message QueryAuthorizationListRequest {}
+// QueryAuthorizationListResponse is the response type for the
+// Query/AuthorizationList RPC
+message QueryAuthorizationListResponse {
+  AuthorizationList authorization_list = 1 [ (gogoproto.nullable) = false ];
+}
+
+// QueryAuthorizationRequest is the request type for the Query/Authorization RPC
+// method.
+message QueryAuthorizationRequest { string msg_url = 1; }
+
+// QueryAuthorizationResponse is the response type for the Query/Authorization
+// RPC method.
+message QueryAuthorizationResponse {
+  Authorization authorization = 1 [ (gogoproto.nullable) = false ];
+}
+
+// QueryGetPoliciesRequest is the request type for the Query/Policies RPC
+// method.
+message QueryGetPoliciesRequest {}
+
+// QueryGetPoliciesResponse is the response type for the Query/Policies RPC
+// method.
+message QueryGetPoliciesResponse {
+  Policies policies = 1 [ (gogoproto.nullable) = false ];
+}
+
+// QueryGetChainInfoRequest is the request type for the Query/ChainInfo RPC
+// method.
+message QueryGetChainInfoRequest {}
+
+// QueryGetChainInfoResponse is the response type for the Query/ChainInfo RPC
+// method.
+message QueryGetChainInfoResponse {
+  ChainInfo chain_info = 1 [ (gogoproto.nullable) = false ];
+}

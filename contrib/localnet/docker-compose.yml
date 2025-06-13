@@ -1,0 +1,474 @@
+# This docker-compose file configures the localnet environment
+# it contains the following services:
+# - MuseChain with 2 nodes (musecore0, musecore1). When profile set to stress, 4 nodes will be created.
+# - A observer set with 2 clients (museclient0, museclient1). When profile set to stress, 4 clients will be created.
+# - An Ethereum node (eth)
+# - A secondary optional Ethereum node (eth2) enabled when profile is set to eth2
+# - A Bitcoin node (bitcoin)
+# - An orchestrator to manage interaction with the localnet (orchestrator)
+# - An upgrade host to serve binaries for the upgrade tests (upgrade-host). Only enabled when profile is set to upgrade.
+# - An upgrade orchestrator to send the upgrade governance proposal (upgrade-orchestrator). Only enabled when profile is set to upgrade.
+#
+# If you are using third party images in CI, you should copy them into ghcr via https://github.com/RWAs-labs/copy-docker-images
+
+networks:
+  mynetwork:
+    ipam:
+      config:
+        - subnet: 172.20.0.0/24
+
+services:
+  musecore0:
+    image: musenode:latest
+    container_name: musecore0
+    hostname: musecore0
+    ports:
+      - "1317:1317"
+      - "9545:8545"
+      - "9546:8546"
+      - "26657:26657"
+      - "6060:6060"
+      - "9090:9090"
+    healthcheck:
+      # use the mevm endpoint for the healthcheck as it is the slowest to come up
+      test: ["CMD", "curl", "-f", "-X", "POST", "--data", '{"jsonrpc":"2.0","method":"web3_clientVersion","params":[],"id":67}', "-H", "Content-Type: application/json", "http://localhost:8545"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: ${MUSECORED_START_PERIOD-30s}
+      start_interval: 1s
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.11
+    entrypoint: ["/root/start-musecored.sh"]
+    environment:
+      - HOTKEY_BACKEND=file
+      - HOTKEY_PASSWORD=password # test purposes only
+      - MUSECORED_IMPORT_GENESIS_DATA=${MUSECORED_IMPORT_GENESIS_DATA-}
+    volumes:
+      - ssh:/root/.ssh
+      - ~/.musecored/genesis_data:/root/genesis_data
+
+  musecore1:
+    image: ${MUSECORE1_IMAGE-musenode:latest}
+    platform: ${MUSECORE1_PLATFORM-}
+    container_name: musecore1
+    hostname: musecore1
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.12
+    entrypoint: ["/root/start-musecored.sh"]
+    environment:
+      - HOTKEY_BACKEND=file
+      - HOTKEY_PASSWORD=password # test purposes only
+    volumes:
+      - ssh:/root/.ssh
+
+  musecore2:
+    image: musenode:latest
+    container_name: musecore2
+    hostname: musecore2
+    profiles:
+      - stress
+      - all
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.13
+    entrypoint: ["/root/start-musecored.sh", "4"]
+    environment:
+      - HOTKEY_BACKEND=file
+      - HOTKEY_PASSWORD=password # test purposes only
+    volumes:
+      - ssh:/root/.ssh
+
+  musecore3:
+    image: musenode:latest
+    container_name: musecore3
+    hostname: musecore3
+    profiles:
+      - stress
+      - all
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.14
+    entrypoint: ["/root/start-musecored.sh", "4"]
+    environment:
+      - HOTKEY_BACKEND=file
+      - HOTKEY_PASSWORD=password # test purposes only
+    volumes:
+      - ssh:/root/.ssh
+
+  museclient0:
+    image: musenode:latest
+    container_name: museclient0
+    hostname: museclient0
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.21
+    entrypoint: /root/start-museclientd.sh
+    environment:
+      - ETHDEV_ENDPOINT=http://eth:8545
+      - HOTKEY_BACKEND=file
+      - HOTKEY_PASSWORD=password # test purposes only
+      - PPROF_ADDR=0.0.0.0:6061
+    restart: always
+    ports:
+      - "6061:6061" # pprof
+      - "8886:8886" # metrics
+    volumes:
+      - ssh:/root/.ssh
+      - preparams:/root/preparams
+
+  museclient1:
+    image: musenode:latest
+    container_name: museclient1
+    hostname: museclient1
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.22
+    entrypoint: /root/start-museclientd.sh
+    environment:
+      - ETHDEV_ENDPOINT=http://eth:8545
+      - HOTKEY_BACKEND=file
+      - HOTKEY_PASSWORD=password # test purposes only
+    restart: always
+    volumes:
+      - ssh:/root/.ssh
+      - preparams:/root/preparams
+
+  museclient2:
+    image: musenode:latest
+    container_name: museclient2
+    hostname: museclient2
+    profiles:
+      - stress
+      - all
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.23
+    entrypoint: /root/start-museclientd.sh
+    environment:
+      - HOTKEY_BACKEND=file
+      - HOTKEY_PASSWORD=password # test purposes only
+    volumes:
+      - ssh:/root/.ssh
+      - preparams:/root/preparams
+
+  museclient3:
+    image: musenode:latest
+    container_name: museclient3
+    hostname: museclient3
+    profiles:
+      - stress
+      - all
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.24
+    entrypoint: /root/start-museclientd.sh
+    environment:
+      - HOTKEY_BACKEND=file
+      - HOTKEY_PASSWORD=password # test purposes only
+    volumes:
+      - ssh:/root/.ssh
+      - preparams:/root/preparams
+
+  musecore-new-validator:
+    image: musenode:latest
+    container_name: musecore-new-validator
+    hostname: musecore-new-validator
+    profiles:
+      - tss
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.15
+    entrypoint: ["/root/start-musecored.sh", "4"]
+    environment:
+      - HOTKEY_BACKEND=file
+      - HOTKEY_PASSWORD=password # test purposes only
+    volumes:
+      - ssh:/root/.ssh
+
+  museclient-new-validator:
+    image: musenode:latest
+    container_name: museclient-new-validator
+    hostname: museclient-new-validator
+    profiles:
+      - tss
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.25
+    entrypoint: /root/start-museclientd.sh
+    environment:
+      - HOTKEY_BACKEND=file
+      - HOTKEY_PASSWORD=password # test purposes only
+    volumes:
+      - ssh:/root/.ssh
+      - preparams:/root/preparams
+
+  eth:
+    image: ghcr.io/muse-chain/ethereum-client-go:v1.10.26
+    container_name: eth
+    hostname: eth
+    ports:
+      - "8545:8545"
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.100
+    entrypoint: ["geth", "--dev", "--datadir", "/root/data", "--http", "--http.addr", "172.20.0.100", "--http.vhosts", "*", "--http.api", "eth,web3,net", "--http.corsdomain", "https://remix.ethereum.org", "--dev.period", "2", "--"]
+
+  eth2:
+    build:
+      context: ./anvil
+    container_name: eth2
+    hostname: eth2
+    profiles:
+      - eth2
+      - all
+    platform: linux/amd64
+    ports:
+      - "8546:8545"
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.102
+
+  bitcoin:
+    image: ghcr.io/muse-chain/bitcoin-core-docker:28.0-muse6
+    container_name: bitcoin
+    hostname: bitcoin
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.101
+    ports:
+      - "18443:18443"
+    command: /opt/wallet.sh
+    environment:
+      - CHAIN=regtest
+      - RPC_USER=smoketest
+      - RPC_PASSWORD=123
+      - ADMIN_RPC_USER=admin
+      - ADMIN_RPC_PASSWORD=admin
+
+  solana:
+    image: solana-local:latest
+    container_name: solana
+    hostname: solana
+    profiles:
+      - solana
+      - all
+      - stress
+    restart: always
+    ports:
+      - "8899:8899"
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.103
+    entrypoint: ["/usr/bin/start-solana.sh"]
+    volumes:
+      - ssh:/root/.ssh
+
+  ton:
+    # figure out why E2E fail with MyLocalTon v124 @ deposit: deployer.CreateWallet(..)
+    # image: ghcr.io/muse-chain/ton-docker:4f08c1d
+    image: ghcr.io/muse-chain/ton-docker:a69ea0f
+    container_name: ton
+    hostname: ton
+    profiles:
+      - ton
+      - all
+    ports:
+      - "8111:8000" # sidecar
+      - "4443:4443" # lite client
+    environment:
+      DOCKER_IP: 172.20.0.104
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.104
+
+  sui:
+    image: ghcr.io/muse-chain/sui-docker:mainnet-v1.41.1
+    container_name: sui
+    hostname: sui
+    profiles:
+      - sui
+      - all
+      - stress
+    ports:
+      - "9000:9000" # RPC
+    environment:
+      DOCKER_IP: 172.20.0.105
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.105
+    entrypoint: ["sui", "start", "--with-faucet"]
+
+  orchestrator:
+    image: orchestrator:latest
+    tty: true
+    container_name: orchestrator
+    depends_on:
+      musecore0:
+        condition: service_healthy
+      eth:
+        condition: service_started
+    hostname: orchestrator
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.2
+    entrypoint: ["/work/start-musee2e.sh", "local"]
+    # add public dns to be able to resolve github.com for sui gateway upgrade test
+    dns:
+      - 8.8.8.8
+      - 8.8.4.4
+    environment:
+      - LOCALNET_MODE=${LOCALNET_MODE-}
+      - E2E_ARGS=${E2E_ARGS-}
+      - UPGRADE_HEIGHT=${UPGRADE_HEIGHT-}
+      - CI=${CI-}
+    volumes:
+      - ssh:/root/.ssh
+
+  upgrade-host:
+    image: musenode:latest
+    container_name: upgrade-host
+    hostname: upgrade-host
+    profiles:
+      - upgrade
+      - all
+    entrypoint: ["/root/start-upgrade-host.sh"]
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.250
+    volumes:
+      - ssh:/root/.ssh
+
+  upgrade-orchestrator:
+    # must run from old node for api compatibility
+    image: musenode:old
+    container_name: upgrade-orchestrator
+    hostname: upgrade-orchestrator
+    profiles:
+      - upgrade
+      - all
+    entrypoint: ["/root/start-upgrade-orchestrator.sh"]
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.251
+    depends_on:
+      - musecore0
+      - upgrade-host
+    environment:
+      - UPGRADE_HEIGHT=${UPGRADE_HEIGHT-}
+    volumes:
+      - ssh:/root/.ssh
+
+  grafana:
+    image: ghcr.io/muse-chain/grafana-grafana:11.2.0
+    container_name: grafana
+    hostname: grafana
+    profiles:
+      - monitoring
+      - all
+    volumes:
+      - ./grafana/datasource.yaml:/etc/grafana/provisioning/datasources/datasource.yaml
+      - ./grafana/dashboards/:/etc/grafana/provisioning/dashboards
+      - ./grafana/grafana.ini:/etc/grafana/grafana.ini
+      - grafana_storage:/var/lib/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.30
+    depends_on:
+      - prometheus
+
+  prometheus:
+    image: ghcr.io/muse-chain/prom-prometheus:v2.53.1
+    container_name: prometheus
+    hostname: prometheus
+    profiles:
+      - monitoring
+      - all
+    volumes:
+      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.31
+    depends_on:
+      - musecore0
+
+  musechain-exporter:
+    image: musechain/musechain-exporter:v2.0.6
+    container_name: musechain-exporter
+    hostname: musechain-exporter
+    profiles:
+      - monitoring
+      - all
+    ports:
+      - "9015:9015"
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.32
+    environment:
+      - ETH_EVM_URL=http://eth:8545
+      - MUSE_EVM_URL=http://musecore0:8545
+      - MUSE_LCD_URL=http://musecore0:1317
+      - MUSE_TENDERMINT_URL=http://musecore0:26657
+      - ETH_CHAIN_ID=1337
+      - MUSE_CHAIN_ID=7001
+      - REFRESH_INTERVAL=15
+      - FAST_REFRESH_INTERVAL=1
+    depends_on:
+      musecore0:
+        condition: service_healthy
+      eth:
+        condition: service_started
+
+  loki:
+    container_name: loki
+    image: ghcr.io/muse-chain/grafana-loki:3.1.0
+    hostname: loki
+    profiles:
+      - monitoring
+      - all
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.33
+    command: -config.file=/etc/loki/local-config.yaml
+
+  promtail:
+    container_name: promtail
+    image: ghcr.io/muse-chain/grafana-promtail:2.9.9
+    hostname: promtail
+    profiles:
+      - monitoring
+      - all
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.34
+    volumes:
+      - ./promtail/config.yaml:/etc/promtail/config.yaml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/config.yaml
+
+  grafana-cloudflared:
+    container_name: grafana-cloudflared
+    image: ghcr.io/muse-chain/cloudflare-cloudflared:2024.9.1
+    hostname: grafana-cloudflared
+    profiles:
+      - monitoring-cloudflared
+      - all
+    command:
+      - tunnel
+      - --no-autoupdate
+      - --url
+      - http://grafana:3000
+    networks:
+      mynetwork:
+        ipv4_address: 172.20.0.35
+    depends_on:
+      - grafana
+
+volumes:
+  ssh:
+  preparams:
+  grafana_storage:
